@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--Israel Showell-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	
+    <!-- Includes the Socket.IO client library to enable real-time communication -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+	<!--
+	The integrity attribute provides a security feature called Subresource Integrity (SRI). 
+	It allows web developers to ensure that the resources fetched
+	from external servers have not been tampered with.
+	-->
+	
+	<!--
+	The crossorigin attribute is used to configure how the browser handles CORS 
+	(Cross-Origin Resource Sharing) requests for the resource. 
+	CORS is a security feature that restricts web pages from making requests to a 
+	different domain than the one that served the web page, with certain exceptions.
+	-->
+	
+	<!--
+	anonymous: This setting allows the request to be made with no credentials 
+	(cookies, client SSL certificates, etc.). If the server does not give 
+	explicit permission (via CORS headers) to share the resource, the browser blocks its use.
+	-->
+    <title>Live Chat App</title>
+	
+</head>
+<body>
+    <div class="messages">
+        <!-- Creates the input field for typing messages -->
+        <input placeholder="Message" id="messageInput" />
+    </div>
+
+    <script>
+        // Connects to the server using Socket.IO
+        const socket = io();
+
+        // Selects the container where messages will be displayed
+        let messageContainer = document.querySelector(".messages");
+
+        // When connected, displays a message indicating the connection is successful
+        socket.on("connect", () => {
+            let p = document.createElement("p")
+            p.innerText = "You're connected"
+            messageContainer.appendChild(p)
+        })
+
+        // Listens for the Enter key press to send the message
+        let messageInput = document.getElementById("messageInput")
+		
+		//Listens for a keypress event
+        messageInput.addEventListener("keypress", (e) => {
+            // Checks if the key pressed is Enter
+            if (e.which === 13) {
+                // Sends the message to the server
+                socket.emit("message", messageInput.value)
+                // Clears the input field
+                messageInput.value = ""
+            }
+        })
+
+        // Listens for messages from the server and display them
+        socket.on('message', (message) => {
+            let messageElement = document.createElement("p")
+            messageElement.innerText = message
+            messageContainer.appendChild(messageElement)
+        })
+
+    </script>
+</body>
+</html>
